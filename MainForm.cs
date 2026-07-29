@@ -318,13 +318,18 @@ namespace CTL472_OsuDriver
             pnl.Controls.Add(_chkLeftHanded);
             top += 32;
 
-            // Custom Rotation Angle Input
-            Label lblAngle = CreateLabel("📐 Rotation Angle (°):");
-            lblAngle.Location = new Point(15, top + 4);
-            pnl.Controls.Add(lblAngle);
+            // Custom Rotation Angle Input Grid
+            TableLayoutPanel gridOrient = new TableLayoutPanel
+            {
+                Location = new Point(10, top),
+                Size = new Size(360, 32),
+                ColumnCount = 2,
+                RowCount = 1
+            };
+            gridOrient.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 55F));
+            gridOrient.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 45F));
 
             _numRotationAngle = CreateNumericInput(0.0, 360.0, (decimal)_config.RotationAngle);
-            _numRotationAngle.Location = new Point(160, top);
             _numRotationAngle.Increment = 1.0m;
             _numRotationAngle.ValueChanged += (s, e) =>
             {
@@ -332,8 +337,11 @@ namespace CTL472_OsuDriver
                 _driver.UpdateConfig(_config);
                 _tabletCanvas.Invalidate();
             };
-            pnl.Controls.Add(_numRotationAngle);
-            top += 35;
+
+            gridOrient.Controls.Add(CreateLabel("📐 Rotation Angle (°):"), 0, 0);
+            gridOrient.Controls.Add(_numRotationAngle, 1, 0);
+            pnl.Controls.Add(gridOrient);
+            top += 38;
 
             // Group 3: Driver Options
             Label lblOptTitle = new Label
