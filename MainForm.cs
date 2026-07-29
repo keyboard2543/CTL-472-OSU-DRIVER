@@ -539,6 +539,7 @@ namespace CTL472_OsuDriver
             _numHeight.Value = (decimal)Math.Min(95.0, Math.Max(5.0, _config.AreaHeight));
             _numOffsetX.Value = (decimal)Math.Min(152.0, Math.Max(0.0, _config.OffsetX));
             _numOffsetY.Value = (decimal)Math.Min(95.0, Math.Max(0.0, _config.OffsetY));
+            _numRotationAngle.Value = (decimal)Math.Min(360.0, Math.Max(0.0, _config.RotationAngle));
 
             _driver.UpdateConfig(_config);
         }
@@ -647,11 +648,13 @@ namespace CTL472_OsuDriver
 
         private RectangleF _activeRectPx;
         private bool _isDragging = false;
+        private bool _isRotating = false;
         private Point _dragStart;
         private PointF _origOffset;
 
         private int _resizeHandle = -1; // 0: TL, 1: TR, 2: BL, 3: BR
         private PointF _origAreaSize;
+        private PointF _rotateHandlePx;
 
         private PointF _penPosMm = new PointF(-1, -1);
 
@@ -732,41 +735,72 @@ namespace CTL472_OsuDriver
 
             _activeRectPx = new RectangleF(areaX, areaY, areaW, areaH);
 
+            // Calculate Active Area Center & Rotation
+            PointF areaCenter = new PointF(areaX + areaW / 2f, areaY + areaH / 2f);
+            float rotAngle = (float)_config.RotationAngle;
+
+            GraphicsState state = g.Save();
+            g.TranslateTransform(areaCenter.X, areaCenter.Y);
+            g.RotateTransform(rotAngle);
+
+            RectangleF localRect = new RectangleF(-areaW / 2f, -areaH / 2f, areaW, areaH);
+
             // Draw Active Area Fill & Border
             using (SolidBrush areaBrush = new SolidBrush(Color.FromArgb(40, 0, 210, 255)))
             using (Pen areaPen = new Pen(Color.FromArgb(0, 210, 255), 2.5f))
             {
-                areaPen.DashStyle = DashStyle.Solid;
-                g.FillRectangle(areaBrush, _activeRectPx);
-                g.DrawRectangle(areaPen, areaX, areaY, areaW, areaH);
+                g.FillRectangle(areaBrush, localRect);
+                g.DrawRectangle(areaPen, localRect.X, localRect.Y, localRect.Width, localRect.Height);
+            }
+
+            // Draw Top Rotation Handle & Line
+            PointF topCenterLocal = new PointF(0, -areaH / 2f);
+            PointF rotateHandleLocal = new PointF(0, -areaH / 2f - 24f);
+
+            using (Pen linePen = new Pen(Color.FromArgb(0, 210, 255), 2f) { DashStyle = DashStyle.Dot })
+            using (SolidBrush rotateBrush = new SolidBrush(Color.Gold))
+            using (Pen rotateBorder = new Pen(Color.White, 2f))
+            {
+                g.DrawLine(linePen, topCenterLocal, rotateHandleLocal);
+                g.FillEllipse(rotateBrush, rotateHandleLocal.X - 8, rotateHandleLocal.Y - 8, 16, 16);
+                g.DrawEllipse(rotateBorder, rotateHandleLocal.X - 8, rotateHandleLocal.Y - 8, 16, 16);
             }
 
             // Draw Corner Handles for Resizing
             float handleSize = 8f;
-            PointF[] handles = new PointF[]
+            PointF[] localHandles = new PointF[]
             {
-                new PointF(areaX, areaY),                           // TL
-                new PointF(areaX + areaW, areaY),                  // TR
-                new PointF(areaX, areaY + areaH),                  // BL
-                new PointF(areaX + areaW, areaY + areaH)           // BR
+                new PointF(localRect.Left, localRect.Top),
+                new PointF(localRect.Right, localRect.Top),
+                new PointF(localRect.Left, localRect.Bottom),
+                new PointF(localRect.Right, localRect.Bottom)
             };
 
-            using (SolidBrush handleBrush = new SolidBrush(Color.Gold))
+            using (SolidBrush handleBrush = new SolidBrush(Color.Cyan))
             {
-                foreach (PointF h in handles)
+                foreach (PointF h in localHandles)
                 {
                     g.FillRectangle(handleBrush, h.X - handleSize / 2, h.Y - handleSize / 2, handleSize, handleSize);
                 }
             }
 
-            // Draw Active Area Dimensions Label inside rectangle
+            // Draw Active Area Dimensions & Angle Label inside rectangle
             using (Font f = new Font("Segoe UI", 10F, FontStyle.Bold))
             using (SolidBrush sb = new SolidBrush(Color.White))
             {
-                string infoStr = string.Format(CultureInfo.InvariantCulture, "{0:F1} x {1:F1} mm", _config.AreaWidth, _config.AreaHeight);
+                string infoStr = string.Format(CultureInfo.InvariantCulture, "{0:F1} x {1:F1} mm ({2:F0}°)", _config.AreaWidth, _config.AreaHeight, _config.RotationAngle);
                 SizeF sz = g.MeasureString(infoStr, f);
-                g.DrawString(infoStr, f, sb, areaX + (areaW - sz.Width) / 2, areaY + (areaH - sz.Height) / 2);
+                g.DrawString(infoStr, f, sb, -sz.Width / 2f, -sz.Height / 2f);
             }
+
+            g.Restore(state);
+
+            // Compute Rotation Handle Location in Canvas Coordinates for Hit-Testing
+            double rad = rotAngle * (Math.PI / 180.0);
+            float handleRelY = -areaH / 2f - 24f;
+            float rotHx = (float)(0 * Math.Cos(rad) - handleRelY * Math.Sin(rad));
+            float rotHy = (float)(0 * Math.Sin(rad) + handleRelY * Math.Cos(rad));
+            _rotateHandlePx = new PointF(areaCenter.X + rotHx, areaCenter.Y + rotHy);
 
             // Draw Pen Tracking Indicator
             if (_penPosMm.X >= 0 && _penPosMm.Y >= 0)
@@ -787,10 +821,15 @@ namespace CTL472_OsuDriver
         {
             base.OnMouseDown(e);
 
-            // Check handles click first
-            float scaleX = (this.Width - 60f) / 152.0f;
-            float handleRadius = 10f;
+            // Check Rotation Handle click first
+            if (Math.Abs(e.X - _rotateHandlePx.X) <= 14f && Math.Abs(e.Y - _rotateHandlePx.Y) <= 14f)
+            {
+                _isRotating = true;
+                return;
+            }
 
+            // Check corner resize handles click
+            float handleRadius = 10f;
             PointF[] handles = new PointF[]
             {
                 new PointF(_activeRectPx.Left, _activeRectPx.Top),
@@ -827,7 +866,18 @@ namespace CTL472_OsuDriver
             float scaleX = _activeRectPx.Width / (float)_config.AreaWidth;
             float scaleY = _activeRectPx.Height / (float)_config.AreaHeight;
 
-            if (_isDragging)
+            if (_isRotating)
+            {
+                PointF center = new PointF(_activeRectPx.Left + _activeRectPx.Width / 2f, _activeRectPx.Top + _activeRectPx.Height / 2f);
+                double rad = Math.Atan2(e.Y - center.Y, e.X - center.X);
+                double deg = rad * (180.0 / Math.PI) + 90.0;
+                if (deg < 0) deg += 360.0;
+                _config.RotationAngle = Math.Round(deg % 360.0, 0);
+
+                if (AreaChanged != null) AreaChanged(this, EventArgs.Empty);
+                this.Invalidate();
+            }
+            else if (_isDragging)
             {
                 float dxMm = (e.X - _dragStart.X) / scaleX;
                 float dyMm = (e.Y - _dragStart.Y) / scaleY;
@@ -863,6 +913,7 @@ namespace CTL472_OsuDriver
         {
             base.OnMouseUp(e);
             _isDragging = false;
+            _isRotating = false;
             _resizeHandle = -1;
         }
     }
