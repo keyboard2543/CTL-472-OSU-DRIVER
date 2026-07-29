@@ -1,19 +1,16 @@
-# Wacom CTL-472 Ultra-Low Latency osu! Driver v1.0.0 ⚡🎮
+# Wacom CTL-472 Ultra-Low Latency osu! Driver v1.1.0 📐🎨
 
-First official release of the dedicated, high-performance C# driver for **Wacom One (CTL-472)**, specifically engineered for *osu!* players.
+Official v1.1.0 Release introducing **Interactive Drag-to-Rotate UI** and **Custom 2D Rotation Angle ($0^\circ - 360^\circ$)** for tilted tablet desk setups.
 
 ---
 
-## ⚡ What's New in v1.0.0
+## 🌟 What's New in v1.1.0
 
-- **🚀 Direct Win32 Low-Latency Kernel Read**: Bypasses heavy OS wrappers for sub-millisecond hardware packet response.
-- **🔓 Wacom Digitizer Feature Report Unlock**: Unlocks CTL-472 firmware from Mouse Emulation mode to high-speed Raw Digitizer Mode using `HidD_SetFeature` (`0x02` / `0x03`).
-- **🔥 Pure 200 Hz Raw Mode (5.0 ms)**: Hardware pass-through mode with 0ms buffering for raw, unfiltered input response.
-- **⚡ 1000 Hz Sub-Frame Ultra-Smooth Engine**: Microsecond-precision Stopwatch loop for ultra-smooth tracking on 144Hz / 240Hz / 360Hz+ monitors.
-- **🎯 Absolute 1:1 Positioning**: Direct virtual desktop mapping via Win32 `SendInput` (`MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_VIRTUALDESK`).
-- **🎨 Interactive Active Area Canvas**: Live visual click-and-drag area resizing with millimeter display.
-- **🔄 Orientation & Handedness**: 180° Rotate (Upside-down tablet) and Left-Handed Mode (Horizontal flip).
-- **🖐️ Physical USB Mouse Auto-Release**: Instantly releases cursor hold when pen is out of range, allowing normal mouse usage.
+- **🎨 Interactive Drag-to-Rotate Visual UI**: Click and drag the visual Gold Knob on the tablet canvas to dynamically rotate your active area in real-time.
+- **📐 Custom 2D Rotation Angle ($0^\circ..360^\circ$)**: Sub-millisecond 2D rotation matrix allowing players to angle their tablet on their desk (e.g. 15°, 30°, 45°, 90°, etc.) with zero latency.
+- **🛠️ UI Layout & Alignment Grid Fixes**: Aligned numeric input controls and labels inside clean TableLayoutPanels for crisp DPI scaling.
+- **🖐️ Physical USB Mouse Auto-Release**: Instant cursor release when pen is out of range.
+- **🔥 Pure 200 Hz Raw Mode (5.0 ms)** & **⚡ 1000 Hz Sub-Frame Engine**: Full performance mode options preserved.
 
 ---
 
@@ -22,15 +19,12 @@ First official release of the dedicated, high-performance C# driver for **Wacom 
 
 ---
 
-# 🇹🇭 รายละเอียดการปล่อยเวอร์ชัน v1.0.0 (ภาษาไทย)
+# 🇹🇭 รายละเอียดการปล่อยเวอร์ชัน v1.1.0 (ภาษาไทย)
 
-โปรแกรมไดรเวอร์เมาส์ปากกา **Wacom One (CTL-472)** เวอร์ชันแรกอย่างเป็นทางการ สร้างขึ้นมาเพื่อเกมเมอร์ *osu!* โดยเฉพาะ
+อัปเดตเวอร์ชัน v1.1.0 เพิ่มระบบ **หมุน Active Area อิสระด้วยการคลิกลากบนหน้าจอ UI** และ **ปรับองศา 2D Rotation Angle ($0^\circ - 360^\circ$)** สำหรับผู้เล่นที่วางแท่นเมาส์ปากกาเอียงบนโต๊ะ
 
-- **🚀 ดึงข้อมูลระดับ Win32 Kernel**: อ่านพิกัดจาก USB โดยตรงเพื่อความเร็วสูงสุดแบบ Sub-millisecond
-- **🔓 ปลุกชิป Wacom 100%**: ปลุกเฟิร์มแวร์เมาส์ปากกา CTL-472 เข้าสู่ Raw Digitizer Mode สปีดสูงสุดด้วยรหัส `0x02` และ `0x03`
-- **🔥 โหมดพลังดิบ 200 Hz (5.0 ms)**: รับค่าพิกัดดิบจากฮาร์ดแวร์โดยตรง 0ms Buffering
-- **⚡ 1000 Hz Sub-Frame Engine**: เอนจินเพิ่มความเนียนลื่นระดับ 1ms สำหรับจอ 144Hz / 240Hz / 360Hz+
-- **🎯 Absolute Mode 1:1**: แมปพิกัดตรงด้วย Win32 `SendInput`
-- **🎨 Visual Canvas**: คลิกลากขยาย/ย้ายขอบ Active Area บนหน้าจอจำลองได้ทันที
-- **🔄 Rotate 180° & Left-Handed Mode**: โหมดหมุนกลับหัวและโหมดกลับด้านสำหรับคนถนัดมือซ้าย
+- **🎨 คลิกลากหมุนกรอบบน UI ได้ทันที**: ใช้เมาส์คลิกหมุดสีทองบนหน้าต่างจำลองแท็บเล็ตแล้วลากหมุนองศาได้อิสระ 360 องศา
+- **📐 รองรับมุมเอียง 2D Rotation Angle (0°..360°)**: คำนวณเมทริกซ์หมุนพิกัด 2 มิติ ไร้ความหน่วง (0ms Input Lag)
+- **🛠️ ปรับปรุง Layout UI**: จัดระเบียบข้อความและช่องกรอกตัวเลขด้วย TableLayoutPanel ไม่ซ้อนทับกัน
 - **🖐️ Physical Mouse Release**: คายการจับเมาส์อัตโนมัติเมื่อยกปากกาออก ทำให้เมาส์ปกติเลื่อนได้อิสระ
+- **🔥 200 Hz Raw Mode & ⚡ 1000 Hz Sub-Frame Engine**: สลับโหมดประสิทธิภาพดิบ 200Hz หรือ 1000Hz สมูทได้ตามต้องการ
