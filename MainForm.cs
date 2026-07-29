@@ -29,6 +29,7 @@ namespace CTL472_OsuDriver
         private NumericUpDown _numHeight;
         private NumericUpDown _numOffsetX;
         private NumericUpDown _numOffsetY;
+        private NumericUpDown _numRotationAngle;
 
         // Checkboxes & Buttons
         private CheckBox _chkRotate180;
@@ -315,6 +316,23 @@ namespace CTL472_OsuDriver
                 _tabletCanvas.Invalidate();
             };
             pnl.Controls.Add(_chkLeftHanded);
+            top += 32;
+
+            // Custom Rotation Angle Input
+            Label lblAngle = CreateLabel("📐 Rotation Angle (°):");
+            lblAngle.Location = new Point(15, top + 4);
+            pnl.Controls.Add(lblAngle);
+
+            _numRotationAngle = CreateNumericInput(0.0, 360.0, (decimal)_config.RotationAngle);
+            _numRotationAngle.Location = new Point(160, top);
+            _numRotationAngle.Increment = 1.0m;
+            _numRotationAngle.ValueChanged += (s, e) =>
+            {
+                _config.RotationAngle = (double)_numRotationAngle.Value;
+                _driver.UpdateConfig(_config);
+                _tabletCanvas.Invalidate();
+            };
+            pnl.Controls.Add(_numRotationAngle);
             top += 35;
 
             // Group 3: Driver Options

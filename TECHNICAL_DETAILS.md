@@ -126,12 +126,17 @@ Active area offsets and bounds are normalized to range $[0.0, 1.0]$:
 $$\text{Norm}_X = \text{Clamp}\left(\frac{X_{trans} - \text{Offset}_X}{\text{Area}_W}, 0.0, 1.0\right)$$
 $$\text{Norm}_Y = \text{Clamp}\left(\frac{Y_{trans} - \text{Offset}_Y}{\text{Area}_H}, 0.0, 1.0\right)$$
 
-### Orientation: Rotate 180° & Left-Handed Mode
-* **Rotate 180°**:
-  $$X_{trans} = 152.0 - X_{mm}$$
-  $$Y_{trans} = 95.0 - Y_{mm}$$
+### Orientation: 2D Arbitrary Rotation Angle (0°..360°) & Left-Handed Mode
+The driver translates coordinates relative to the physical tablet center $(C_x, C_y) = (76.0\text{ mm}, 47.5\text{ mm})$ and rotates by angle $\theta = \text{RotationAngle} + (\text{Rotate180} ? 180^\circ : 0^\circ)$:
+
+$$\alpha = (\theta \bmod 360^\circ) \times \frac{\pi}{180.0}$$
+$$X_{rel} = X_{mm} - 76.0, \quad Y_{rel} = Y_{mm} - 47.5$$
+$$X_{rot} = X_{rel} \cos(\alpha) - Y_{rel} \sin(\alpha)$$
+$$Y_{rot} = X_{rel} \sin(\alpha) + Y_{rel} \cos(\alpha)$$
+$$X_{trans} = X_{rot} + 76.0, \quad Y_{trans} = Y_{rot} + 47.5$$
+
 * **Left-Handed Mode (Horizontal Flip)**:
-  $$X_{trans} = 152.0 - X_{mm}$$
+  $$X_{trans} = 152.0 - X_{trans}$$
 
 ### Normalized Absolute Pointer Injection (`SendInput`)
 In Absolute Mode, normalized coordinates $[0.0, 1.0]$ are mapped to Windows virtual desktop coordinates ($0..65535$) and injected using Win32 `SendInput`:

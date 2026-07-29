@@ -470,14 +470,25 @@ namespace CTL472_OsuDriver
                 double mmX = rawX * (PHYSICAL_WIDTH_MM / RAW_MAX_X);
                 double mmY = rawY * (PHYSICAL_HEIGHT_MM / RAW_MAX_Y);
 
-                // Apply Rotations & Transformations
+                // Apply Rotations & 2D Arbitrary Angle Transformations
+                double totalAngleDeg = _config.RotationAngle + (_config.Rotate180 ? 180.0 : 0.0);
                 double transX = mmX;
                 double transY = mmY;
 
-                if (_config.Rotate180)
+                if (Math.Abs(totalAngleDeg % 360.0) > 0.01)
                 {
-                    transX = PHYSICAL_WIDTH_MM - transX;
-                    transY = PHYSICAL_HEIGHT_MM - transY;
+                    double rad = (totalAngleDeg % 360.0) * (Math.PI / 180.0);
+                    double cx = PHYSICAL_WIDTH_MM / 2.0; // 76.0 mm
+                    double cy = PHYSICAL_HEIGHT_MM / 2.0; // 47.5 mm
+
+                    double relX = mmX - cx;
+                    double relY = mmY - cy;
+
+                    double rotX = relX * Math.Cos(rad) - relY * Math.Sin(rad);
+                    double rotY = relX * Math.Sin(rad) + relY * Math.Cos(rad);
+
+                    transX = rotX + cx;
+                    transY = rotY + cy;
                 }
 
                 if (_config.LeftHanded)

@@ -12,6 +12,7 @@ namespace CTL472_OsuDriver
         public double OffsetY { get; set; }
         
         public bool Rotate180 { get; set; }
+        public double RotationAngle { get; set; }
         public bool LeftHanded { get; set; }
         public bool LockAspectRatio { get; set; }
         public double AspectRatioValue { get; set; }
@@ -30,6 +31,7 @@ namespace CTL472_OsuDriver
             OffsetX = 28.0;
             OffsetY = 20.5;
             Rotate180 = false;
+            RotationAngle = 0.0;
             LeftHanded = false;
             LockAspectRatio = true;
             AspectRatioValue = 16.0 / 9.0;
@@ -66,6 +68,7 @@ namespace CTL472_OsuDriver
                     writer.WriteLine(string.Format(CultureInfo.InvariantCulture, "OffsetX={0}", OffsetX));
                     writer.WriteLine(string.Format(CultureInfo.InvariantCulture, "OffsetY={0}", OffsetY));
                     writer.WriteLine("Rotate180=" + Rotate180);
+                    writer.WriteLine(string.Format(CultureInfo.InvariantCulture, "RotationAngle={0}", RotationAngle));
                     writer.WriteLine("LeftHanded=" + LeftHanded);
                     writer.WriteLine("LockAspectRatio=" + LockAspectRatio);
                     writer.WriteLine(string.Format(CultureInfo.InvariantCulture, "AspectRatioValue={0}", AspectRatioValue));
@@ -119,6 +122,9 @@ namespace CTL472_OsuDriver
                                 break;
                             case "Rotate180":
                                 if (bool.TryParse(value, out bVal)) config.Rotate180 = bVal;
+                                break;
+                            case "RotationAngle":
+                                if (double.TryParse(value, NumberStyles.Any, CultureInfo.InvariantCulture, out dVal)) config.RotationAngle = dVal;
                                 break;
                             case "LeftHanded":
                                 if (bool.TryParse(value, out bVal)) config.LeftHanded = bVal;

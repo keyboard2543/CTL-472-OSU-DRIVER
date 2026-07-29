@@ -12,7 +12,7 @@ A high-performance, ultra-low latency C# Windows Forms application designed spec
 - **⚡ 1000 Hz Sub-Frame Ultra-Smooth Engine**: High-resolution 1ms microsecond spin-wait loop for buttery-smooth cursor tracking on 144Hz / 240Hz / 360Hz+ monitors.
 - **🎯 1:1 Absolute Mode**: Direct hardware coordinate mapping using Win32 `SendInput` (`MOUSEEVENTF_ABSOLUTE | MOUSEEVENTF_VIRTUALDESK`).
 - **🎨 Interactive Active Area Canvas**: Click and drag to resize or move your tablet active area visually with live millimeter display.
-- **🔄 Orientation & Handedness Controls**: 180° Rotate (Upside down tablet) and Left-Handed Mode (Horizontal flip).
+- **🔄 Orientation & Handedness Controls**: Custom 2D Rotation Angle ($0^\circ - 360^\circ$ for tilted/angled tablet setups), 180° Quick Rotate, and Left-Handed Mode (Horizontal flip).
 - **🖐️ Physical USB Mouse Release**: Automatically releases OS cursor hold when pen is out of range, allowing seamless physical mouse usage.
 - **🎯 Aim & Latency Test Arena**: Built-in interactive Aim Arena to test positioning accuracy and latency directly within the app.
 
